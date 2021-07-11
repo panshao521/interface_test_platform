@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}项目测试结果统计{% endblock %}
+{% block content %}
+
+<style>
+    .center{
+         width:500px,
+         margin-left: 10px;
+         background-color: bisque;
+         }
+
+
+</style>
+<body>
+<p style="margin-left: 10px;">
+    <b>{{test_project.name}}</b>
+    <span style="margin-left: 5px;">的执行统计结果：成功 {{ success_num }} 次，失败了 {{ fail_num }} 次</span>
+</p>
+<p style="margin-left: 10px;">
+    <span>统计图表如下所示：</span>
+</p>
+<div class="center" id="main" style="width: 600px; height:400px; margin-left: 10px;" align="center"></div>
+<!--<script src="{% static 'js/echarts.simple.min.js' %}"></script>-->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+        // 绘制图表。
+        echarts.init(document.getElementById('main')).setOption({
+            title: {
+                text: '结果统计',
+                subtext: '即时数据',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+               orient: 'vertical',
+               left: 'left'
+            },
+            series: {
+                name: '结果统计',
+                radius: '55%',
+                type: 'pie',
+                color: ['green', 'red'],
+                data: [
+                    {name: '成功的用例', value: {{ success_num }}},
+                    {name: '失败的用例', value: {{ fail_num }}},
+                    
+                ],
+                label:{
+                        color:"#000"
+                    }
+            }
+        });
+
+
+</script>
+
+
+</body>
+
+{% endblock %}
+

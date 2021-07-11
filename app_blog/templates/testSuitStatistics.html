@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}测试集合结果统计{% endblock %}
+{% block content %}
+
+
+<body>
+<p style="margin-left: 10px;">
+    <span style="margin-left: 5px;">测试集合的执行结果图显示：成功 {{ success_num }} 次，失败了 {{ fail_num }} 次</span>
+<p>
+<div id="main" style="width: 600px;height:400px; margin-left: 10px;"></div>
+<!--<script src="{% static 'js/echarts.simple.min.js' %}"></script>-->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+        // 绘制图表。
+        echarts.init(document.getElementById('main')).setOption({
+            series: {
+                type: 'pie',
+                color: ['green', 'red'],
+                data: [
+                    {name: '成功的次数', value: {{ success_num }}},
+                    {name: '失败的次数', value: {{ fail_num }}},
+
+                ]
+            }
+        });
+        echarts.init(document.getElementById('main')).setOption({
+            title: {
+                text: '结果统计',
+                subtext: '即时数据',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+               orient: 'vertical',
+               left: 'left'
+            },
+            series: {
+                name: '结果统计',
+                radius: '55%',
+                type: 'pie',
+                color: ['green', 'red'],
+                data: [
+                    {name: '成功的次数', value: {{ success_num }}},
+                    {name: '失败的用例', value: {{ fail_num }}},
+
+                ],
+                label:{
+                        color:"#000"
+                    }
+            }
+        });
+</script>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>测试集合名称</th>
+            <th>延迟执行时间</th>
+            <th>执行状态</th>
+            <th>测试结果</th>
+            <th>创建者</th>
+            <th>创建时间</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for test_suit_record in test_suit_records %}
+        <tr>
+            <td>{{ test_suit_record.id }}</td>
+            <td><a href="{% url 'suitCaseExecuteRecord' test_suit_record.id %}">{{ test_suit_record.test_suit.suite_desc }}</a></td>
+            <td>{{ test_suit_record.run_time_interval }}</a></td>
+            {% if test_suit_record.status %}
+                <td>执行完毕</td>
+            {% else %}
+                <td>待执行</td>
+            {% endif %}
+            <td>{{ test_suit_record.test_result|default_if_none:"" }}</a></td>
+            <td>{{ test_suit_record.creator }}</td>
+            <td>{{ test_suit_record.create_time|date:"Y-n-d H:i" }}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{# 实现分页标签的代码 #}
+{# 这里使用 bootstrap 渲染页面 #}
+<div id="pages" class="text-center">
+    <nav>
+        <ul class="pagination">
+            <li class="step-links">
+                {% if test_suit_records.has_previous %}
+                <a class='active' href="?page={{ test_suit_records.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                <span class="current">
+                    第 {{ test_suit_records.number }} 页/共 {{ test_suit_records.paginator.num_pages }} 页</span>
+
+                {% if test_suit_records.has_next %}
+                <a class='active' href="?page={{ test_suit_records.next_page_number }}">下一页</a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+
+{% endblock %}
+
